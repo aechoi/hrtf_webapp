@@ -2,24 +2,19 @@ import waveforms from "./waveforms.js";
 
 const processFiles = (function () {
   const input = document.getElementById("fileInput");
+  const addButton = document.getElementById("addButton");
   const player = document.getElementById("audioPlayer");
   const download = document.getElementById("download");
   let reader;
 
-  // const waveformCanvas = document.getElementById("waveformCanvas");
-  // const waveformCanvasContext = waveformCanvas.getContext("2d");
-  // waveformCanvasContext.clearRect(
-  //   0,
-  //   0,
-  //   waveformCanvas.width,
-  //   waveformCanvas.height
-  // );
   let rawAudio = [];
 
   // Load data into player when file is uploaded
-  input.addEventListener("change", fileChange);
+  // input.addEventListener("change", fileChange);
+  addButton.addEventListener("click", fileChange);
   function fileChange(event) {
-    const file = event.target.files[0];
+    if (input.files.length === 0) return;
+    const file = input.files[0];
 
     reader = new FileReader();
     // takes a while for the file to load. So do this once it's read.
@@ -39,27 +34,6 @@ const processFiles = (function () {
         console.log("raw audio length: " + rawAudio.length);
 
         waveforms.drawFull(rawAudio);
-
-        // // update canvas
-        // const rowHeight = 200;
-        // waveformCanvas.height = rawAudio.length * rowHeight;
-
-        // // plot waveform
-        // console.log("plotting waveform");
-        // const bufferLength = latestAudio.length;
-        // const waveformWidth = waveformCanvas.width;
-        // const waveformCenter = (rawAudio.length - 1 + 0.5) * rowHeight;
-        // waveformCanvasContext.beginPath();
-        // waveformCanvasContext.moveTo(0, waveformCenter);
-
-        // console.log("drawing waveform");
-        // for (let i = 0; i < bufferLength; i++) {
-        //   const x = (i / bufferLength) * waveformWidth;
-        //   const y = waveformCenter - (latestAudio[i] * rowHeight) / 2;
-        //   waveformCanvasContext.lineTo(x, y);
-        // }
-
-        // waveformCanvasContext.stroke();
       });
     };
 
