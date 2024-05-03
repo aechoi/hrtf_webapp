@@ -4,7 +4,7 @@ const processFiles = (function () {
   const input = document.getElementById("fileInput");
   const addButton = document.getElementById("addButton");
   const player = document.getElementById("audioPlayer");
-  const download = document.getElementById("download");
+  // const download = document.getElementById("download");
   let reader;
 
   let rawAudio = [];
@@ -22,6 +22,7 @@ const processFiles = (function () {
     reader.onload = function (event) {
       download.disabled = false;
       player.src = reader.result;
+      console.log(reader.result);
 
       const arrayBuffer = event.target.result;
       const audioContext = new (window.AudioContext ||
@@ -32,8 +33,8 @@ const processFiles = (function () {
         let latestAudio = decodedBuffer.getChannelData(0);
         rawAudio.push(latestAudio);
         console.log("raw audio length: " + rawAudio.length);
-
-        waveforms.drawFull(rawAudio);
+        console.log(reader);
+        waveforms.updateFull(rawAudio, reader.result);
       });
     };
 
@@ -47,13 +48,13 @@ const processFiles = (function () {
     player.play;
   }
 
-  if (!reader) download.disabled = true;
-  download.addEventListener("click", downloadFile);
-  function downloadFile() {
-    const a = document.createElement("a");
-    if (!reader) return;
-    a.href = player.src;
-    a.download = "audio.wav";
-    a.click();
-  }
+  // if (!reader) download.disabled = true;
+  // download.addEventListener("click", downloadFile);
+  // function downloadFile() {
+  //   const a = document.createElement("a");
+  //   if (!reader) return;
+  //   a.href = player.src;
+  //   a.download = "audio.wav";
+  //   a.click();
+  // }
 })();

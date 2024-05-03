@@ -1,4 +1,5 @@
 const waveforms = (function () {
+  const fullWaveTable = document.getElementById("fullWaveTable");
   const waveformCanvas = document.getElementById("waveformCanvas");
   const waveformCanvasContext = waveformCanvas.getContext("2d");
   waveformCanvasContext.clearRect(
@@ -8,7 +9,7 @@ const waveforms = (function () {
     waveformCanvas.height
   );
 
-  function drawFull(rawAudio) {
+  function updateFull(rawAudio, fileData) {
     // todo make a waveform object that stores the waveform data + stuff like
     // how much the waveform has been panned left to right
     // also, this may work better by putting the canvas on a slider and having
@@ -16,34 +17,58 @@ const waveforms = (function () {
     // this would automatically give things like having zero defined and not
     // letting you pan past the end of the longest waveform. Although you'd
     // want a way to extend data past the end.
+    // TODO: fix download
 
     console.log("drawFull called");
-    console.log(rawAudio);
+    fullWaveTable.innerHTML = "";
 
-    // update canvas
-    const rowHeight = 200;
-    waveformCanvas.height = rawAudio.length * rowHeight;
+    for (let i = 0; i < rawAudio.length; i++) {
+      let row = fullWaveTable.insertRow(i);
+      let cell0 = row.insertCell(0);
+      let cell1 = row.insertCell(1);
+      let cell2 = row.insertCell(2);
 
-    // plot waveform
-    console.log("plotting waveform");
-    const bufferLength = rawAudio[rawAudio.length - 1].length;
-    const waveformWidth = waveformCanvas.width;
+      let radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = "fullWave";
+      cell0.appendChild(radio);
 
-    console.log("drawing waveform");
-    waveformCanvasContext.beginPath();
-    for (let waveIdx = 0; waveIdx < rawAudio.length; waveIdx++) {
-      const waveformCenter = (waveIdx + 0.5) * rowHeight;
-      waveformCanvasContext.moveTo(0, waveformCenter);
-      for (let i = 0; i < bufferLength; i++) {
-        const x = (i / bufferLength) * waveformWidth;
-        const y = waveformCenter - (rawAudio[waveIdx][i] * rowHeight) / 2;
-        waveformCanvasContext.lineTo(x, y);
+      // create canvas for waveform
+      let fullCanvas = document.createElement("canvas");
+      fullCanvas.setAttribute("width", "800");
+      fullCanvas.setAttribute("height", "200");
+      let fullCtx = fullCanvas.getContext("2d");
+
+      // plot waveform
+      console.log("plotting waveform");
+      const bufferLength = rawAudio[rawAudio.length - 1].length;
+      const waveformWidth = fullCanvas.width;
+      fullCtx.beginPath();
+      const waveformCenter = 0.5 * fullCanvas.height;
+      fullCtx.moveTo(0, waveformCenter);
+      for (let j = 0; j < bufferLength; j++) {
+        const x = (j / bufferLength) * waveformWidth;
+        const y = waveformCenter - (rawAudio[i][j] * fullCanvas.height) / 2;
+        fullCtx.lineTo(x, y);
       }
+      fullCtx.stroke();
+      cell1.appendChild(fullCanvas);
+
+      // save button
+      let saveButton = document.createElement("button");
+      saveButton.innerHTML = "Download";
+      saveButton.addEventListener("click", function downloadFile() {
+        const a = document.createElement("a");
+        a.href = fileData;
+        console.log(fileData);
+        a.download = "audio.wav";
+        a.click();
+      });
+      cell2.appendChild(saveButton);
     }
-    waveformCanvasContext.stroke();
   }
 
-  return { drawFull };
+  return { updateFull };
 })();
 
 export default waveforms;
